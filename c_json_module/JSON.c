@@ -271,6 +271,8 @@ ObjectList ParseJSON(const char* file)
 			pushListObject(&list, &builder);
 			builder = (JSONObject){ NULL, 0, NULL, 0, NULL };
 			currentObject = &builder;
+			pushDepth(&depthTypes, Object, &depth);
+			cursor++;
 		}
 	}
 
@@ -519,8 +521,9 @@ static void allocateInput(char** input, const int count)
 
 static void setValue(char** input, JSONObject* value, int* count)
 {
-	(*input)[*count] = '\0';
-	value->values[value->valueCount] = *input;//values never got allocated
+	// only on MONTH does an error occur (for both objects), both names, year, and day all work
+	(*input)[*count] = '\0'; // value->valueCount = 1
+	value->values[value->valueCount] = *input; // value->values[value->valueCount] = 20 / 4 (first list item / second list item), according to debugger
 	value->valueCount++;
 	*input = NULL;
 	*count = 0;
