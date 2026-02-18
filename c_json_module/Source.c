@@ -1,5 +1,7 @@
 #include "JSON.h"
+
 #include <assert.h>
+#include <conio.h>
 #include <malloc.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -16,6 +18,7 @@ typedef struct Date
 typedef struct Person
 {
 	char** name;
+	int nameCount;
 	Date dob;
 	bool male;
 } Person;
@@ -31,35 +34,49 @@ int main()
 		return 1;
 	}
 
-
-	people = (Person*)calloc(list.length, sizeof(Person));
+	int length = list.length;
+	people = (Person*)calloc(length, sizeof(Person));
 	assert(people);
 
 	JSONObject* currentObject;
-	int length = list.length;
 	for (int index = 0; index < length; index++)
 	{
 		currentObject = GetObject(&list, index);
-		people[index].name = (char**)calloc(currentObject->objects[0].valueCount, sizeof(char*));
+		people[index].nameCount = currentObject->objects[0].values->length;
+		people[index].name = (char**)calloc(people[index].nameCount, sizeof(char*));
 		assert(people[index].name);
-		for (int name = 0; name < currentObject->objects[0].valueCount; name++)
+		for (int name = 0; name < people[index].nameCount; name++)
 		{
-			people[index].name[name] = currentObject->objects[0].values[name];
+			people[index].name[name] = (char*)calloc(sizeof(SLGetter(currentObject->objects[0].values, name)), sizeof(char));
+			assert(people[index].name[name]);
+			for (int letter = 0; letter <= strlen(SLGetter(currentObject->objects[0].values, name)); letter++)
+			{
+				people[index].name[name][letter] = SLGetter(currentObject->objects[0].values, name)[letter];
+			}
 		}
-		people[index].dob.month = atoi(currentObject->objects[1].values[0]);
-		people[index].dob.day = 20; // atoi(currentObject->objects[1].values[1]); // currentObject->objects[1].values[1] causes read access violation, see setValues for debuging
-		people[index].dob.year = atoi(currentObject->objects[1].values[2]);
-		people[index].male = currentObject->values[0][0] == 't' ? true : false;
+		people[index].dob.month = atoi(SLGetter(currentObject->objects[1].values, 0));
+		people[index].dob.day = atoi(SLGetter(currentObject->objects[1].values, 1));
+		people[index].dob.year = atoi(SLGetter(currentObject->objects[1].values, 2));
+		people[index].male = SLGetter(currentObject->values, 0)[0] == 't' ? true : false;
 	}
+
+	FreeObjectList(&list);
 
 	for (int index = 0; index < length; index++)
 	{
 		printf("Person #%d:\n", index + 1);
-		printf("%s %s\n%d-%d-%d\n%s\n",
-			people[index].name[0], people[index].name[1],
+		for (int name = 0; name < people[index].nameCount; name++)
+		{
+			if (name > 0)
+				printf(" ");
+			printf("%s", people[index].name[name]);
+		}
+		printf("\n%d-%d-%d\n%s\n",
 			people[index].dob.year, people[index].dob.month, people[index].dob.day,
 			(people[index].male ? "Male" : "Female"));
 	}
 
-	getchar();
+	printf("program ended successfully\npress any key to continue . . . ");
+	_getch();
+	return EXIT_SUCCESS;
 }
