@@ -1,0 +1,122 @@
+[
+  {
+    "ID": 24803,
+    "Name": "Greirat the Thief",
+    "Weapons": {
+      "R-hand Weapons": [ "Bandit's Knife + 2" ],
+      "L-hand Weapons": [ "Iron Round Shield +2" ]
+    },
+    "Armor": {
+      "Helm": "Thrall Hood",
+      "Armor": "Deserter Armor",
+      "Gauntlets": "Soldier's Gauntlets",
+      "Leggings": "Deserter Trousers"
+    },
+    "Arrows": [ "Standard Arrow", "Standard Arrow" ],
+    "Bolts": [ "Standard Bolt", "Standard Bolt" ],
+    "Spells": [],
+    "Items": [ "Throwing Knife" ],
+    "Soul Level": 40,
+    "Attributes": {
+      "VIG": 21,
+      "ATT": 10,
+      "END": 12,
+      "VIT": 20,
+      "STR": 20,
+      "SKL": 22,
+      "INT": 9,
+      "FTH": 11,
+      "LCK": 5
+    }
+  },
+  {
+    "ID": 29540,
+    "Name": "Kirk, Knight of Thorns",
+    "Weapons": {
+      "R-hand Weapons": [ "Barbed Straight Sword + 2" ],
+      "L-hand Weapons": [ "Spiked Shield +2" ]
+    },
+    "Armor": {
+      "Helm": "Helm of Thorns",
+      "Armor": "Armor of Thorns",
+      "Gauntlets": "Gauntlets of Thorns",
+      "Leggings": "Leggings of Thorns"
+    },
+    "Arrows": [ "Standard Arrow", "Standard Arrow" ],
+    "Bolts": [ "Standard Bolt", "Standard Bolt" ],
+    "Spells": [],
+    "Items": [ "Estus Flask x2", "", "Undead Hunter Charm", "Dual Charm", "Devine Blessing x2" ],
+    "Soul Level": 90,
+    "Attributes": {
+      "VIG": 25,
+      "ATT": 18,
+      "END": 25,
+      "VIT": 21,
+      "STR": 45,
+      "SKL": 16,
+      "INT": 9,
+      "FTH": 12,
+      "LCK": 9
+    }
+  },
+  {
+    "ID": 28040,
+    "Name": "Daughter of Crystal Kriemhild",
+    "Weapons": {
+      "R-hand Weapons": [ "Sage's Crystal Staff +5", "Crystal Sage's Rapier +5" ],
+      "L-hand Weapons": [ "Parrying Dagger +5" ]
+    },
+    "Armor": {
+      "Helm": "",
+      "Armor": "Fire Keeper Robe",
+      "Gauntlets": "Fire Keeper Gloves",
+      "Leggings": "Fire Keeper Skirt"
+    },
+    "Arrows": [ "Standard Arrow", "Standard Arrow" ],
+    "Bolts": [ "Standard Bolt", "Standard Bolt" ],
+    "Spells": [ "Crystal Soul Spear", "Homing Crystal Soulmass", "Crystal Hail" ],
+    "Items": [ "Estus Flask x2" ],
+    "Soul Level": 92,
+    "Attributes": {
+      "VIG": 35,
+      "ATT": 18,
+      "END": 22,
+      "VIT": 1,
+      "STR": 21,
+      "SKL": 23,
+      "INT": 60,
+      "FTH": 1,
+      "LCK": 1
+    }
+  },
+  {
+    "ID": 26209,
+    "Name": "[UNKNOWN]",
+    "Weapons": {
+      "R-hand Weapons": [ "Storm Ruler", "Long Sword +4" ],
+      "L-hand Weapons": [ "Silver Eagle Kite Shield +4", "Buckler Shield +4" ]
+    },
+    "Armor": {
+      "Helm": "Knight Helm",
+      "Armor": "Knight Armor",
+      "Gauntlets": "Knight Gauntlets",
+      "Leggings": "Knight Leggings"
+    },
+    "Arrows": [ "Standard Arrow x30", "Poison Arrow x30" ],
+    "Bolts": [ "Standard Bolt x30", "Wood Bolt x30" ],
+    "Spells": [],
+    "Items": [ "Estus Flask x7", "Ashen Flask x3", "Throwing Knife", "Firebomb", "Alluring Skull", "Charcoal Pine Resin", "Blooming Purple Moss Clump", "Ember" ],
+    "Soul Level": 57,
+    "Attributes": {
+      "VIG": 18,
+      "ATT": 15,
+      "END": 18,
+      "VIT": 19,
+      "STR": 26,
+      "SKL": 18,
+      "INT": 10,
+      "FTH": 12,
+      "LCK": 11
+    }
+  }
+]
