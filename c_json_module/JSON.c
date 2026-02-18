@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#define EMPTY_OBJECT = (JSONObject){ NULL, 0, NULL, NULL }
-#define EMPTY_OBJECT_LIST (ObjectList){ NULL, 0 }
+#define EMPTY_OBJECT = (JSONObject){ ((void *)0), 0, ((void *)0), ((void *)0) }
+#define EMPTY_OBJECT_LIST (ObjectList){ ((void *)0), 0 }
 
 struct OLNode
 {
