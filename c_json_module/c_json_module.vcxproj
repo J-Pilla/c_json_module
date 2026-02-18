@@ -125,12 +125,14 @@
   <ItemGroup>
     <ClCompile Include="JSON.c" />
     <ClCompile Include="Source.c" />
+    <ClCompile Include="StringList.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="example.json" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="JSON.h" />
+    <ClInclude Include="StringList.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="example.txt" />
