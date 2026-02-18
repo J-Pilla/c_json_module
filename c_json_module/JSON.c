@@ -32,7 +32,7 @@ static void allocateInput(char**, const int);
 static void setValue(char**, JSONObject*, int*);
 static void setValueTrue(JSONObject*, int*);
 static void setValueFalse(JSONObject*, int*);
-static void freeObjectArray(JSONObject*);
+static void freeObject(JSONObject*);
 
 ObjectList ParseJSON(const char* file)
 {
@@ -300,10 +300,15 @@ void FreeObjectList(ObjectList* list)
 	{
 		list->firstNode = list->firstNode->link;
 
-		if (node->value.objects != NULL)
+		for (int index = 0; index < node->value.objectCount; index++)
 		{
-			freeObjectArray(node->value.objects);
+			if (node->value.objects != NULL)
+			{
+				freeObject(&node->value.objects[index]);
+			}
 		}
+		free(node->value.objects);
+		node->value.objects = NULL;
 
 		SLDestructor(node->value.values);
 
@@ -540,13 +545,17 @@ static void setValueFalse(JSONObject* object, int* cursor)
 	(*cursor) += 4;
 }
 
-static void freeObjectArray(JSONObject* array)
+static void freeObject(JSONObject* object)
 {
-	if (array->objects != NULL)
+	for (int index = 0; index < object->objectCount; index++)
 	{
-		freeObjectArray(array->objects);
+		if (object->objects != NULL)
+		{
+			freeObject(&object->objects[index]);
+		}
 	}
-	SLDestructor(array->values);
+	free(object->objects);
+	object->objects = NULL;
 
-	free(array);
+	SLDestructor(object->values);
 }
