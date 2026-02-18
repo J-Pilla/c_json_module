@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <malloc.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -330,6 +331,7 @@ static char* fileToString(const char* file)
 	int characterCount = 0, bufferCount = 0;
 	{ // while loop header
 		int cursor = 0, input;
+		bool isInString = false;
 		while (!feof(fin))
 		{
 			if (cursor == BUFFER - 1)
@@ -349,8 +351,13 @@ static char* fileToString(const char* file)
 			}
 
 			input = fgetc(fin);
+			
+			if ((char)input == '"')
+			{
+				isInString = !isInString;
+			}
 
-			if (isspace(input) != 0)
+			if (isspace(input) != 0 && !isInString)
 			{
 				continue;
 			}
