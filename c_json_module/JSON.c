@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#define EMPTY_OBJECT = (JSONObject){ NULL, 0, NULL, NULL }
+#define EMPTY_OBJECT_LIST (ObjectList){ NULL, 0 }
+
 struct OLNode
 {
 	JSONObject value;
@@ -24,13 +27,11 @@ static void pushListObject(ObjectList*, const JSONObject*);
 static void pushDepth(Type**, const Type, int*);
 static void popDepth(Type**, int*);
 static void allocateObject(JSONObject**);
-static void allocateValue(JSONObject**);
 static void allocateInput(char**, const int);
 static void setValue(char**, JSONObject*, int*);
 static void setValueTrue(JSONObject*, int*);
 static void setValueFalse(JSONObject*, int*);
 static void freeObjectArray(JSONObject*);
-static void freeStringArray(char**, const int);
 
 ObjectList ParseJSON(const char* file)
 {
@@ -79,7 +80,8 @@ ObjectList ParseJSON(const char* file)
 	ObjectList list = { NULL, 0 };
 
 	// an object to build the current node
-	JSONObject builder = { NULL, 0, NULL, 0, NULL };
+	JSONObject builder = { NULL, 0, NULL, NULL };
+	builder.values = SLConstructor();
 	char* strInput = NULL;
 
 	JSONObject* currentObject = &builder;
@@ -118,7 +120,6 @@ ObjectList ParseJSON(const char* file)
 					pushDepth(&depthTypes, Array, &depth);
 					break;
 				case '\"':
-					allocateValue(&currentObject);
 					pushDepth(&depthTypes, String, &depth);
 					break;
 				case '0':
@@ -131,16 +132,13 @@ ObjectList ParseJSON(const char* file)
 				case '7':
 				case '8':
 				case '9':
-					allocateValue(&currentObject);
 					pushDepth(&depthTypes, Number, &depth);
 					cursor--;
 					break;
 				case 't':
-					allocateValue(&currentObject);
 					setValueTrue(currentObject, &cursor);
 					break;
 				case 'f':
-					allocateValue(&currentObject);
 					setValueFalse(currentObject, &cursor);
 					break;
 				}
@@ -163,7 +161,6 @@ ObjectList ParseJSON(const char* file)
 				pushDepth(&depthTypes, Array, &depth);
 				break;
 			case '\"':
-				allocateValue(&currentObject);
 				pushDepth(&depthTypes, String, &depth);
 				break;
 			case '0':
@@ -176,16 +173,13 @@ ObjectList ParseJSON(const char* file)
 			case '7':
 			case '8':
 			case '9':
-				allocateValue(&currentObject);
 				pushDepth(&depthTypes, Number, &depth);
 				cursor--;
 				break;
 			case 't':
-				allocateValue(&currentObject);
 				setValueTrue(currentObject, &cursor);
 				break;
 			case 'f':
-				allocateValue(&currentObject);
 				setValueFalse(currentObject, &cursor);
 				break;
 			case ']':
@@ -269,7 +263,8 @@ ObjectList ParseJSON(const char* file)
 		if (depth == ROOT && JSON[cursor] == ',')
 		{
 			pushListObject(&list, &builder);
-			builder = (JSONObject){ NULL, 0, NULL, 0, NULL };
+			builder = (JSONObject){ NULL, 0, NULL, NULL };
+			builder.values = SLConstructor();
 			currentObject = &builder;
 			pushDepth(&depthTypes, Object, &depth);
 			cursor++;
@@ -309,10 +304,7 @@ void FreeObjectList(ObjectList* list)
 			freeObjectArray(node->value.objects);
 		}
 
-		if (node->value.values != NULL)
-		{
-			freeStringArray(node->value.values, node->value.valueCount);
-		}
+		SLDestructor(node->value.values);
 
 		free(node);
 		node = list->firstNode;
@@ -486,23 +478,9 @@ static void allocateObject(JSONObject** currentObject)
 		(*currentObject)->objects = temp;
 	}
 
-	(*currentObject)->objects[(*currentObject)->objectCount - 1] = (JSONObject){ NULL, 0, NULL, 0, *currentObject };
+	(*currentObject)->objects[(*currentObject)->objectCount - 1] = (JSONObject){ NULL, 0, NULL, *currentObject };
+	(*currentObject)->objects[(*currentObject)->objectCount - 1].values = SLConstructor();
 	*currentObject = &(*currentObject)->objects[(*currentObject)->objectCount - 1];
-}
-
-static void allocateValue(JSONObject** currentObject)
-{
-	if ((*currentObject)->values == NULL)
-	{
-		(*currentObject)->values = (char**)calloc(1, sizeof(char*));
-		assert((*currentObject)->values);
-	}
-	else
-	{
-		char** temp = (char**)realloc((*currentObject)->values, sizeof(char*) * (*currentObject)->valueCount + 1);
-		assert(temp);
-		(*currentObject)->values = temp;
-	}
 }
 
 static void allocateInput(char** input, const int count)
@@ -521,42 +499,36 @@ static void allocateInput(char** input, const int count)
 
 static void setValue(char** input, JSONObject* value, int* count)
 {
-	// only on MONTH does an error occur (for both objects), both names, year, and day all work
-	(*input)[*count] = '\0'; // value->valueCount = 1
-	value->values[value->valueCount] = *input; // value->values[value->valueCount] = 20 / 4 (first list item / second list item), according to debugger
-	value->valueCount++;
+	(*input)[*count] = '\0';
+	SLPush(value->values, *input);
 	*input = NULL;
 	*count = 0;
 }
 
 static void setValueTrue(JSONObject* object, int* cursor)
 {
-	object->values[object->valueCount] = (char*)calloc(sizeof("true\0"), sizeof(char));
-	assert(object->values[object->valueCount]);
-
-	object->values[object->valueCount][0] = 't';
-	object->values[object->valueCount][1] = 'r';
-	object->values[object->valueCount][2] = 'u';
-	object->values[object->valueCount][3] = 'e';
-	object->values[object->valueCount][4] = '\0';
-
-	object->valueCount++;
+	char* input = (char*)calloc(sizeof("true"), sizeof(char));
+	assert(input);
+	input[0] = 't';
+	input[1] = 'r';
+	input[2] = 'u';
+	input[3] = 'e';
+	input[4] = '\0';
+	SLPush(object->values, input);
 	(*cursor) += 3;
 }
 
 static void setValueFalse(JSONObject* object, int* cursor)
 {
-	object->values[object->valueCount] = (char*)calloc(sizeof("false\0"), sizeof(char*));
-	assert(object->values[object->valueCount]);
-
-	object->values[object->valueCount][0] = 'f';
-	object->values[object->valueCount][1] = 'a';
-	object->values[object->valueCount][2] = 'l';
-	object->values[object->valueCount][3] = 's';
-	object->values[object->valueCount][4] = 'e';
-	object->values[object->valueCount][5] = '\0';
-
-	object->valueCount++;
+	char* input = (char*)calloc(sizeof("false"), sizeof(char));
+	assert(input);
+	input[0] = 'f';
+	input[1] = 'a';
+	input[2] = 'l';
+	input[3] = 's';
+	input[4] = 'e';
+	input[5] = '\0';
+	SLPush(object->values, input);
 	(*cursor) += 4;
 }
 
@@ -566,21 +538,7 @@ static void freeObjectArray(JSONObject* array)
 	{
 		freeObjectArray(array->objects);
 	}
-
-	if (array->values != NULL)
-	{
-		freeStringArray(array->values, array->valueCount);
-	}
-
-	free(array);
-}
-
-static void freeStringArray(char** array, const int count)
-{
-	for (int index = 0; index < count; index++)
-	{
-		free(array[index]);
-	}
+	SLDestructor(array->values);
 
 	free(array);
 }
