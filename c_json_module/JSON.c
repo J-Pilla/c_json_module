@@ -330,7 +330,7 @@ static char* fileToString(const char* file)
 	const int BUFFER = 80;
 	int characterCount = 0, bufferCount = 0;
 	{ // while loop header
-		int cursor = 0, input;
+		int cursor = 0, input, previousInput = 0;
 		bool isInString = false;
 		while (!feof(fin))
 		{
@@ -352,7 +352,7 @@ static char* fileToString(const char* file)
 
 			input = fgetc(fin);
 			
-			if ((char)input == '"')
+			if ((char)input == '"' && (char)previousInput != '\\')
 			{
 				isInString = !isInString;
 			}
@@ -362,6 +362,7 @@ static char* fileToString(const char* file)
 				continue;
 			}
 
+			previousInput = input;
 			buffer[bufferCount][cursor] = input >= 0 ? (char)input : '\0';
 			characterCount++;
 			cursor++;
