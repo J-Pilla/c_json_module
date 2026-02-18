@@ -307,7 +307,7 @@ int main()
 		printf("Dexterity: %d\n", npc->attributes.dexterity);
 		printf("Intelligence: %d\n", npc->attributes.intelligence);
 		printf("Faith: %d\n", npc->attributes.faith);
-		printf("Luck: %d\n", npc->attributes.luck);
+		printf("Luck: %d\n\n", npc->attributes.luck);
 	}
 
 	printf("program ended successfully\npress any key to continue . . . ");
