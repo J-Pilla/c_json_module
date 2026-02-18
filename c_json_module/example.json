@@ -1,6 +1,6 @@
 [
   {
-    "name": [ "Jason", "Pilla" ],
+    "name": [ "Jason", "Ryan", "Pilla" ],
     "dob": {
       "month": 12,
       "day": 20,
@@ -9,12 +9,30 @@
     "male": true
   },
   {
-    "name": [ "Joshua", "Pilla" ],
+    "name": [ "Solair", "of Astora" ],
     "dob": {
       "month": 8,
-      "day": 4,
-      "year": 15
+      "day": 13,
+      "year": 94
     },
     "male": true
+  },
+  {
+    "name": [ "Maiden", "Astrea" ],
+    "dob": {
+      "month": 1,
+      "day": 1,
+      "year": 81
+    },
+    "male": false
+  },
+  {
+    "name": [ "Quelaag" ],
+    "dob": {
+      "month": 7,
+      "day": 15,
+      "year": 89
+    },
+    "male": false
   }
 ]
