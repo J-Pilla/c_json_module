@@ -1,4 +1,5 @@
 #include "JSON.h"
+
 #include <assert.h>
 #include <ctype.h>
 #include <malloc.h>
@@ -7,7 +8,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define EMPTY_OBJECT = (JSONObject){ ((void *)0), 0, ((void *)0), ((void *)0) }
 #define EMPTY_OBJECT_LIST (ObjectList){ ((void *)0), 0 }
 
 struct OLNode
@@ -25,10 +25,10 @@ typedef uint8_t Type;
 
 static char* fileToString(const char*);
 static void pushListObject(ObjectList*, const JSONObject*);
-static void pushDepth(Type**, const Type, int*);
+static void pushDepth(Type**, Type, int*);
 static void popDepth(Type**, int*);
 static void allocateObject(JSONObject**);
-static void allocateInput(char**, const int);
+static void allocateInput(char**, size_t);
 static void setValue(char**, JSONObject*, int*);
 static void setValueTrue(JSONObject*, int*);
 static void setValueFalse(JSONObject*, int*);
@@ -277,7 +277,7 @@ ObjectList ParseJSON(const char* file)
 	return list;
 }
 
-const JSONObject* GetObject(const ObjectList* list, const int index)
+const JSONObject* GetObject(const ObjectList* list, int index)
 {
 	if (index < 0 || index >= list->length)
 	{
@@ -329,7 +329,7 @@ static char* fileToString(const char* file)
 		return NULL;
 	}
 
-	char** buffer = (char**)calloc(1, sizeof(char*));
+	char** buffer = calloc(1, sizeof(char*));
 	assert(buffer);
 
 	const int BUFFER = 80;
@@ -344,14 +344,14 @@ static char* fileToString(const char* file)
 				buffer[bufferCount][cursor] = '\0';
 				bufferCount++;
 				cursor = 0;
-				char** temp = (char**)realloc(buffer, sizeof(char*) * (uint64_t)(bufferCount + 1));
+				char** temp = realloc(buffer, sizeof(char*) * (uint64_t)(bufferCount + 1));
 				assert(temp);
 				buffer = temp;
 			}
 
 			if (cursor == 0)
 			{
-				buffer[bufferCount] = (char*)calloc(BUFFER, sizeof(char));
+				buffer[bufferCount] = calloc(BUFFER, sizeof(char));
 				assert(buffer[bufferCount]);
 			}
 
@@ -384,7 +384,7 @@ static char* fileToString(const char* file)
 		return NULL;
 	}
 
-	char* string = (char*)calloc(characterCount, sizeof(char));
+	char* string = calloc(characterCount, sizeof(char));
 	assert(string);
 
 	for (int stringIndex = 0, bufferIndex = 0, cursor = 0;
@@ -419,7 +419,7 @@ static char* fileToString(const char* file)
 
 static void pushListObject(ObjectList* list, const JSONObject* object)
 {
-	OLNode* builder = (OLNode*)malloc(sizeof(OLNode));
+	OLNode* builder = malloc(sizeof(OLNode));
 	assert(builder);
 
 	builder->value = *object;
@@ -439,18 +439,18 @@ static void pushListObject(ObjectList* list, const JSONObject* object)
 	list->length++;
 }
 
-static void pushDepth(Type** array, const Type attribute, int* depth)
+static void pushDepth(Type** array, Type attribute, int* depth)
 {
 	(*depth)++;
 
 	if (*array == NULL)
 	{
-		*array = (Type*)calloc(*depth, sizeof(Type));
+		*array = calloc(*depth, sizeof(Type));
 		assert(*array);
 	}
 	else
 	{
-		Type* temp = (Type*)realloc(*array, sizeof(Type) * (*depth));
+		Type* temp = realloc(*array, sizeof(Type) * (*depth));
 		assert(temp);
 		*array = temp;
 	}
@@ -464,7 +464,7 @@ static void popDepth(Type** array, int* depth)
 
 	if (depth > 0)
 	{
-		Type* temp = (Type*)realloc(*array, sizeof(Type) * (*depth));
+		Type* temp = realloc(*array, sizeof(Type) * (*depth));
 		assert(temp);
 		*array = temp;
 	}
@@ -481,12 +481,12 @@ static void allocateObject(JSONObject** currentObject)
 
 	if ((*currentObject)->objects == NULL)
 	{
-		(*currentObject)->objects = (JSONObject*)calloc(1, sizeof(JSONObject));
+		(*currentObject)->objects = calloc(1, sizeof(JSONObject));
 		assert((*currentObject)->objects);
 	}
 	else
 	{
-		JSONObject* temp = (JSONObject*)realloc((*currentObject)->objects, sizeof(JSONObject) * (*currentObject)->objectCount);
+		JSONObject* temp = realloc((*currentObject)->objects, sizeof(JSONObject) * (*currentObject)->objectCount);
 		assert(temp);
 		(*currentObject)->objects = temp;
 	}
@@ -496,15 +496,15 @@ static void allocateObject(JSONObject** currentObject)
 	*currentObject = &(*currentObject)->objects[(*currentObject)->objectCount - 1];
 }
 
-static void allocateInput(char** input, const int count)
+static void allocateInput(char** input, size_t count)
 {
 	if (*input == NULL)
 	{
-		*input = (char*)calloc((uint64_t)(count + 1), sizeof(char));
+		*input = calloc(count + 1, sizeof(char));
 	}
 	else
 	{
-		char* temp = (char*)realloc(*input, sizeof(char) * (uint64_t)(count + 1));
+		char* temp = realloc(*input, sizeof(char) * count + 1);
 		assert(temp);
 		*input = temp;
 	}
@@ -520,7 +520,7 @@ static void setValue(char** input, JSONObject* value, int* count)
 
 static void setValueTrue(JSONObject* object, int* cursor)
 {
-	char* input = (char*)calloc(sizeof("true"), sizeof(char));
+	char* input = calloc(sizeof("true"), sizeof(char));
 	assert(input);
 	input[0] = 't';
 	input[1] = 'r';
@@ -533,7 +533,7 @@ static void setValueTrue(JSONObject* object, int* cursor)
 
 static void setValueFalse(JSONObject* object, int* cursor)
 {
-	char* input = (char*)calloc(sizeof("false"), sizeof(char));
+	char* input = calloc(sizeof("false"), sizeof(char));
 	assert(input);
 	input[0] = 'f';
 	input[1] = 'a';
