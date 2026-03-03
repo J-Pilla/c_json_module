@@ -61,6 +61,7 @@ int main()
 	if (list.length == 0)
 	{
 		puts("ERROR: Failed to parse JSON");
+		printf("press enter to exit . . . ");
 		getchar();
 		return EXIT_FAILURE;
 	}
@@ -310,7 +311,8 @@ int main()
 		printf("Luck: %d\n\n", npc->attributes.luck);
 	}
 	
-	printf("program ended successfully\npress enter to continue . . . ");
+	puts("program ended successfully");
+	printf("press enter to exit . . . ");
 	getchar();
 	return EXIT_SUCCESS;
 }
