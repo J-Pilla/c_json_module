@@ -1,7 +1,6 @@
 #include "JSON.h"
 
 #include <assert.h>
-#include <conio.h>
 #include <malloc.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -309,8 +308,8 @@ int main()
 		printf("Faith: %d\n", npc->attributes.faith);
 		printf("Luck: %d\n\n", npc->attributes.luck);
 	}
-
-	printf("program ended successfully\npress any key to continue . . . ");
-	{ int key = _getch(); }
+	
+	printf("program ended successfully\npress enter to continue . . . ");
+	{ int key = getchar(); }
 	return EXIT_SUCCESS;
 }
