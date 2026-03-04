@@ -129,7 +129,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Dark Souls 3 NPCs.json" />
-    <None Include="example.json" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="JSON.h" />
