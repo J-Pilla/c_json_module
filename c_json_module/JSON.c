@@ -27,24 +27,26 @@ typedef uint8_t Type;
 #define Boolean 5
 
 static char* fileToString(const char*);
+
 static int pushListObject(ObjectList*, const JSONObject*);
+
 static int pushDepth(Type**, Type, int*);
 static int popDepth(Type**, int*);
+
 static int allocateObject(JSONObject**);
+static int freeObject(JSONObject*);
+
 static int allocateInput(char**, size_t);
 static int setValue(char**, JSONObject*, int*);
 static int setValueTrue(JSONObject*, int*);
 static int setValueFalse(JSONObject*, int*);
-static int freeObject(JSONObject*);
 
 ObjectList ParseJSON(const char* file)
 {
 	char* JSON = fileToString(file);
 
 	if (JSON == NULL || sizeof(JSON) < 5)
-	{
 		return EMPTY_OBJECT_LIST;
-	}
 
 	// depth tracks the hiarchy of the JS objects
 	Type* depthTypes = NULL;
@@ -58,10 +60,9 @@ ObjectList ParseJSON(const char* file)
 		if (JSON[cursor] == '[')
 		{
 			pushDepth(&depthTypes, Array, &depth);
+
 			if (depth == 2)
-			{
 				break;
-			}
 		}
 		else
 		{
@@ -106,9 +107,7 @@ ObjectList ParseJSON(const char* file)
 				for (; cursor < strlen(JSON) - 1; cursor++)
 				{
 					if (JSON[cursor] == '\"' && JSON[cursor - 1] != '\\')
-					{
 						break;
-					}
 				}
 				break;
 			case ':': // ':' signs a value
@@ -280,21 +279,6 @@ ObjectList ParseJSON(const char* file)
 	return list;
 }
 
-const JSONObject* GetObject(const ObjectList* list, int index)
-{
-	if (index < 0 || index >= list->length)
-	{
-		return NULL;
-	}
-
-	OLNode* currentNode = list->firstNode;
-
-	for (int ctr = 0; ctr < index; ctr++)
-		currentNode = currentNode->link;
-
-	return &currentNode->value;
-}
-
 int FreeObjectList(ObjectList* list)
 {
 	if (list->firstNode == NULL)
@@ -309,9 +293,7 @@ int FreeObjectList(ObjectList* list)
 		for (int index = 0; index < node->value.objectCount; index++)
 		{
 			if (node->value.objects != NULL)
-			{
 				freeObject(&node->value.objects[index]);
-			}
 		}
 		free(node->value.objects);
 		node->value.objects = NULL;
@@ -325,6 +307,19 @@ int FreeObjectList(ObjectList* list)
 	list->length = 0;
 
 	return EXIT_SUCCESS;
+}
+
+const JSONObject* GetObject(const ObjectList* list, int index)
+{
+	if (index < 0 || index >= list->length)
+		return NULL;
+
+	OLNode* currentNode = list->firstNode;
+
+	for (int ctr = 0; ctr < index; ctr++)
+		currentNode = currentNode->link;
+
+	return &currentNode->value;
 }
 
 static char* fileToString(const char* file)
@@ -452,6 +447,26 @@ static int pushListObject(ObjectList* list, const JSONObject* object)
 	return EXIT_SUCCESS;
 }
 
+static int freeObject(JSONObject* object)
+{
+	if (object == NULL)
+		return EXIT_FAILURE;
+
+	for (int index = 0; index < object->objectCount; index++)
+	{
+		if (object->objects != NULL)
+		{
+			freeObject(&object->objects[index]);
+		}
+	}
+	free(object->objects);
+	object->objects = NULL;
+
+	SLDestructor(object->values);
+
+	return EXIT_SUCCESS;
+}
+
 static int pushDepth(Type** array, Type attribute, int* depth)
 {
 	if (array == NULL || depth == NULL)
@@ -545,7 +560,7 @@ static int allocateInput(char** input, size_t count)
 
 static int setValue(char** input, JSONObject* value, int* count)
 {
-	if (input == NULL || count == NULL)
+	if (input == NULL || value == NULL || count == NULL)
 		return EXIT_FAILURE;
 
 	(*input)[*count] = '\0';
@@ -589,26 +604,6 @@ static int setValueFalse(JSONObject* object, int* cursor)
 	input[5] = '\0';
 	SLPush(object->values, input);
 	(*cursor) += 4;
-
-	return EXIT_SUCCESS;
-}
-
-static int freeObject(JSONObject* object)
-{
-	if (object == NULL)
-		return EXIT_FAILURE;
-
-	for (int index = 0; index < object->objectCount; index++)
-	{
-		if (object->objects != NULL)
-		{
-			freeObject(&object->objects[index]);
-		}
-	}
-	free(object->objects);
-	object->objects = NULL;
-
-	SLDestructor(object->values);
 
 	return EXIT_SUCCESS;
 }
