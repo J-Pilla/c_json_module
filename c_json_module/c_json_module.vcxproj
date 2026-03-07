@@ -125,14 +125,14 @@
   <ItemGroup>
     <ClCompile Include="JSON.c" />
     <ClCompile Include="Source.c" />
-    <ClCompile Include="StringList.c" />
+    <ClCompile Include="StringMap.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Dark Souls 3 NPCs.json" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="JSON.h" />
-    <ClInclude Include="StringList.h" />
+    <ClInclude Include="StringMap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
