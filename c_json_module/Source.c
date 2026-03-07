@@ -62,11 +62,11 @@ int main()
 	{
 		puts("ERROR: Failed to parse JSON");
 		printf("press enter to exit . . . ");
-		getchar();
+		int key = getchar();
+		fflush(stdin);
 		return EXIT_FAILURE;
 	}
 
-	/*
 	DSIIINPC* npcs = NULL;
 	int length = list.length;
 	npcs = (DSIIINPC*)calloc(length, sizeof(DSIIINPC));
@@ -77,29 +77,31 @@ int main()
 		DSIIINPC* npc = &npcs[index];
 
 		// object pointers
-		const JSONObject* currentObject = GetObject(&list, index);
-		const JSONObject* weaponsObject = &currentObject->objects[0];
-		const JSONObject* rHand = &weaponsObject->objects[0];
-		const JSONObject* lHand = &weaponsObject->objects[1];
-		const JSONObject* armorObject = &currentObject->objects[1];
-		const JSONObject* arrows = &currentObject->objects[2];
-		const JSONObject* bolts = &currentObject->objects[3];
-		const JSONObject* spells = &currentObject->objects[4];
-		const JSONObject* items = &currentObject->objects[5];
-		const JSONObject* attributes = &currentObject->objects[6];
+		const JSONObject* currentObject = OLGetObject(&list, index);
+		const JSONObject* weapons = OMGetObject(&currentObject->objects, "Weapons");
+		const JSONObject* armorObject = OMGetObject(&currentObject->objects, "Armor");
+		const JSONObject* attributes = OMGetObject(&currentObject->objects, "Attributes");
+
+		// array pointers
+		const JSONArray* rHand = AMGetArray(&weapons->arrays, "R-hand Weapons");
+		const JSONArray* lHand = AMGetArray(&weapons->arrays, "L-hand Weapons");
+		const JSONArray* arrows = AMGetArray(&currentObject->arrays, "Arrows");
+		const JSONArray* bolts = AMGetArray(&currentObject->arrays, "Bolts");
+		const JSONArray* spells = AMGetArray(&currentObject->arrays, "Spells");
+		const JSONArray* items = AMGetArray(&currentObject->arrays, "Items");
 
 		// string pointers
-		const char* name = SLGetString(&currentObject->values, 1);
-		const char* helm = SLGetString(&armorObject->values, 0);
-		const char* armor = SLGetString(&armorObject->values, 1);
-		const char* gauntlets = SLGetString(&armorObject->values, 2);
-		const char* leggings = SLGetString(&armorObject->values, 3);
+		const char* name = SMGetString(&currentObject->values, "Name");
+		const char* helm = SMGetString(&armorObject->values, "Helm");
+		const char* armor = SMGetString(&armorObject->values, "Armor");
+		const char* gauntlets = SMGetString(&armorObject->values, "Gauntlets");
+		const char* leggings = SMGetString(&armorObject->values, "Leggings");
 
 		// integer assignment
-		npc->id = atoi(SLGetString(&currentObject->values, 0));
-		npc->level = atoi(SLGetString(&currentObject->values, 2));
+		npc->id = atoi(SMGetString(&currentObject->values, "ID"));
+		npc->level = atoi(SMGetString(&currentObject->values, "Name"));
 
-		// count assignment
+		// array count assignment
 		npc->weapons.rHandCount = rHand->values.length;
 		npc->weapons.lHandCount = lHand->values.length;
 		npc->arrowCount = arrows->values.length;
@@ -107,38 +109,12 @@ int main()
 		npc->spellCount = spells->values.length;
 		npc->itemCount = items->values.length;
 
-		// attribute assignment
-		npc->attributes.vigor = atoi(SLGetString(&attributes->values, 0));
-		npc->attributes.attunement = atoi(SLGetString(&attributes->values, 1));
-		npc->attributes.endurance = atoi(SLGetString(&attributes->values, 2));
-		npc->attributes.vitality = atoi(SLGetString(&attributes->values, 3));
-		npc->attributes.strength = atoi(SLGetString(&attributes->values, 4));
-		npc->attributes.dexterity = atoi(SLGetString(&attributes->values, 5));
-		npc->attributes.intelligence = atoi(SLGetString(&attributes->values, 6));
-		npc->attributes.faith = atoi(SLGetString(&attributes->values, 7));
-		npc->attributes.luck = atoi(SLGetString(&attributes->values, 8));
-
-		// malloc
-		npc->name = (char*)calloc(strlen(name), sizeof(char));
-		assert(npc->name);
-
+		// array allocation
 		npc->weapons.rHand = (char**)calloc(npc->weapons.rHandCount, sizeof(char*));
 		assert(npc->weapons.rHand);
 
 		npc->weapons.lHand = (char**)calloc(npc->weapons.lHandCount, sizeof(char*));
 		assert(npc->weapons.lHand);
-
-		npc->armor.helm = (char*)calloc(strlen(helm), sizeof(char));
-		assert(npc->armor.helm);
-
-		npc->armor.armor = (char*)calloc(strlen(armor), sizeof(char));
-		assert(npc->armor.armor);
-
-		npc->armor.gauntlets = (char*)calloc(strlen(gauntlets), sizeof(char));
-		assert(npc->armor.gauntlets);
-
-		npc->armor.leggings = (char*)calloc(strlen(leggings), sizeof(char));
-		assert(npc->armor.leggings);
 
 		npc->arrows = (char**)calloc(npc->arrowCount, sizeof(char*));
 		assert(npc->arrows);
@@ -152,105 +128,113 @@ int main()
 		npc->items = (char**)calloc(npc->itemCount, sizeof(char*));
 		assert(npc->items);
 
+		// attribute assignment
+		npc->attributes.vigor = atoi(SMGetString(&attributes->values, "VIG"));
+		npc->attributes.attunement = atoi(SMGetString(&attributes->values, "ATT"));
+		npc->attributes.endurance = atoi(SMGetString(&attributes->values, "END"));
+		npc->attributes.vitality = atoi(SMGetString(&attributes->values, "VIT"));
+		npc->attributes.strength = atoi(SMGetString(&attributes->values, "STR"));
+		npc->attributes.dexterity = atoi(SMGetString(&attributes->values, "SKL"));
+		npc->attributes.intelligence = atoi(SMGetString(&attributes->values, "INT"));
+		npc->attributes.faith = atoi(SMGetString(&attributes->values, "FTH"));
+		npc->attributes.luck = atoi(SMGetString(&attributes->values, "LCK"));
+
 		// string assignments
-		// name
-		for (int letter = 0; letter <= strlen(name); letter++)
+		// Name
+		size_t size = strlen(name) + 1;
+		npc->name = malloc(size);
+		assert(npc->name);
+		strcpy_s(npc->name, size, name);
+
+		// Armor
+		size = strlen(helm) + 1;
+		npc->armor.helm = malloc(size);
+		assert(npc->armor.helm);
+		strcpy_s(npc->armor.helm, size, helm);
+
+		size = strlen(armor) + 1;
+		npc->armor.armor = malloc(size);
+		assert(npc->armor.armor);
+		strcpy_s(npc->armor.armor, size, armor);
+
+		size = strlen(gauntlets) + 1;
+		npc->armor.gauntlets = malloc(size);
+		assert(npc->armor.gauntlets);
+		strcpy_s(npc->armor.gauntlets, size, gauntlets);
+
+		size = strlen(leggings) + 1;
+		npc->armor.leggings = malloc(size);
+		assert(npc->armor.leggings);
+		strcpy_s(npc->armor.leggings, size, leggings);
+
+		// R-hand Weapons
+		for (int index = 0; index < npc->weapons.rHandCount; index++)
 		{
-			npc->name[letter] = name[letter];
+			const char* weapon = SLGetString(&rHand->values, index);
+
+			size = strlen(weapon) + 1;
+			npc->weapons.rHand[index] = malloc(size);
+			assert(npc->weapons.rHand[index]);
+			strcpy_s(npc->weapons.rHand[index], size, weapon);
 		}
 
-		// rHandWeapons
-		for (int weaponIndex = 0; weaponIndex < npc->weapons.rHandCount; weaponIndex++)
+		// L-hand Weapons
+		for (int index = 0; index < npc->weapons.lHandCount; index++)
 		{
-			const char* weapon = SLGetString(&rHand->values, weaponIndex);
-			npc->weapons.rHand[weaponIndex] = (char*)calloc(strlen(weapon), sizeof(char));
-			assert(npc->weapons.rHand[weaponIndex]);
-			for (int letter = 0; letter <= strlen(weapon); letter++)
-			{
-				npc->weapons.rHand[weaponIndex][letter] = weapon[letter];
-			}
+			const char* weapon = SLGetString(&lHand->values, index);
+
+			size = strlen(weapon) + 1;
+			npc->weapons.lHand[index] = malloc(size);
+			assert(npc->weapons.lHand[index]);
+			strcpy_s(npc->weapons.lHand[index], size, weapon);
 		}
 
-		// lHandWeapons
-		for (int weaponIndex = 0; weaponIndex < npc->weapons.lHandCount; weaponIndex++)
+		// Arrows
+		for (int index = 0; index < npc->arrowCount; index++)
 		{
-			const char* weapon = SLGetString(&lHand->values, weaponIndex);
-			npc->weapons.lHand[weaponIndex] = (char*)calloc(strlen(weapon), sizeof(char));
-			assert(npc->weapons.lHand[weaponIndex]);
-			for (int letter = 0; letter <= strlen(weapon); letter++)
-			{
-				npc->weapons.lHand[weaponIndex][letter] = weapon[letter];
-			}
+			const char* arrow = SLGetString(&arrows->values, index);
+
+			size_t size = strlen(arrow) + 1;
+			npc->arrows[index] = malloc(size);
+			assert(npc->arrows[index]);
+			strcpy_s(npc->arrows[index], size, arrow);
 		}
 
-		// armor
-		for (int letter = 0; letter <= strlen(helm); letter++)
+		// Bolts
+		for (int index = 0; index < npc->boltCount; index++)
 		{
-			npc->armor.helm[letter] = helm[letter];
-		}
-		for (int letter = 0; letter <= strlen(armor); letter++)
-		{
-			npc->armor.armor[letter] = armor[letter];
-		}
-		for (int letter = 0; letter <= strlen(gauntlets); letter++)
-		{
-			npc->armor.gauntlets[letter] = gauntlets[letter];
-		}
-		for (int letter = 0; letter <= strlen(leggings); letter++)
-		{
-			npc->armor.leggings[letter] = leggings[letter];
+			const char* bolt = SLGetString(&bolts->values, index);
+
+			size_t size = strlen(bolt) + 1;
+			npc->bolts[index] = malloc(size);
+			assert(npc->bolts[index]);
+			strcpy_s(npc->bolts[index], size, bolt);
 		}
 
-		// arrows
-		for (int arrowIndex = 0; arrowIndex < npc->arrowCount; arrowIndex++)
+		// Spells
+		for (int index = 0; index < npc->spellCount; index++)
 		{
-			const char* arrow = SLGetString(&arrows->values, arrowIndex);
-			npc->arrows[arrowIndex] = (char*)calloc(strlen(arrow), sizeof(char));
-			assert(npc->arrows[arrowIndex]);
-			for (int letter = 0; letter <= strlen(arrow); letter++)
-			{
-				npc->arrows[arrowIndex][letter] = arrow[letter];
-			}
+			const char* spell = SLGetString(&spells->values, index);
+
+			size_t size = strlen(spell) + 1;
+			npc->spells[index] = malloc(size);
+			assert(npc->spells[index]);
+			strcpy_s(npc->spells[index], size, spell);
 		}
 
-		// bolts
-		for (int boltIndex = 0; boltIndex < npc->boltCount; boltIndex++)
+		// Items
+		for (int index = 0; index < npc->itemCount; index++)
 		{
-			const char* bolt = SLGetString(&bolts->values, boltIndex);
-			npc->bolts[boltIndex] = (char*)calloc(strlen(bolt), sizeof(char));
-			assert(npc->bolts[boltIndex]);
-			for (int letter = 0; letter <= strlen(bolt); letter++)
-			{
-				npc->bolts[boltIndex][letter] = bolt[letter];
-			}
-		}
+			const char* item = SLGetString(&items->values, index);
 
-		// spells
-		for (int spellIndex = 0; spellIndex < npc->spellCount; spellIndex++)
-		{
-			const char* spell = SLGetString(&spells->values, spellIndex);
-			npc->spells[spellIndex] = (char*)calloc(strlen(spell), sizeof(char));
-			assert(npc->spells[spellIndex]);
-			for (int letter = 0; letter <= strlen(spell); letter++)
-			{
-				npc->spells[spellIndex][letter] = spell[letter];
-			}
-		}
-
-		// items
-		for (int itemIndex = 0; itemIndex < npc->itemCount; itemIndex++)
-		{
-			const char* item = SLGetString(&items->values, itemIndex);
-			npc->items[itemIndex] = (char*)calloc(strlen(item), sizeof(char));
-			assert(npc->items[itemIndex]);
-			for (int letter = 0; letter <= strlen(item); letter++)
-			{
-				npc->items[itemIndex][letter] = item[letter];
-			}
+			size_t size = strlen(item) + 1;
+			npc->items[index] = malloc(size);
+			assert(npc->items[index]);
+			strcpy_s(npc->items[index], size, item);
 		}
 	}
 
-	OLFreeList(&list);
+	JSONFree(&list);
 
 	for (int index = 0; index < length; index++)
 	{
@@ -311,10 +295,10 @@ int main()
 		printf("Faith: %d\n", npc->attributes.faith);
 		printf("Luck: %d\n\n", npc->attributes.luck);
 	}
-	*/
 	
 	puts("program ended successfully");
 	printf("press enter to exit . . . ");
-	getchar();
+	int key = getchar();
+	fflush(stdin);
 	return EXIT_SUCCESS;
 }

@@ -42,7 +42,7 @@ typedef struct JSONArray
 } JSONArray;
 
 JSONObjectList JSONParse(const char* file);
-inline int JSONFree(JSONObjectList* this);
+int JSONFree(JSONObjectList* this);
 
 JSONObject* OLGetObject(JSONObjectList* this, int index);
 JSONArray* ALGetArray(JSONArrayList* this, int index);

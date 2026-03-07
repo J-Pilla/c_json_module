@@ -383,7 +383,7 @@ ObjectList JSONParse(const char* file)
 			case '7':
 			case '8':
 			case '9':
-				SLPush(&currentObject->values, allocateNumber(JSON, &cursor));
+				SLPush(&currentArray->values, allocateNumber(JSON, &cursor));
 
 				if (SLGetString(&currentArray->values, currentArray->values.length - 1) == NULL)
 				{
@@ -396,7 +396,7 @@ ObjectList JSONParse(const char* file)
 			case 't':
 			case 'f':
 				SLPush(
-					&currentObject->values,
+					&currentArray->values,
 					JSON[cursor] == 't' ? "true" : "false"
 				);
 
@@ -439,7 +439,7 @@ ObjectList JSONParse(const char* file)
 	return list;
 }
 
-inline int JSONFree(JSONObjectList* this) { freeObjectList(this); }
+int JSONFree(JSONObjectList* this) { freeObjectList(this); }
 
 JSONObject* OLGetObject(JSONObjectList* this, int index)
 {
