@@ -56,7 +56,7 @@ typedef struct DSIIINPC
 
 int main()
 {
-	JSONObjectList list = JSONParse("Dark Souls 3 NPCs.json");
+	JSONList list = JSONParse("Dark Souls 3 NPCs.json");
 
 	if (list.length == 0)
 	{
@@ -77,18 +77,18 @@ int main()
 		DSIIINPC* npc = &npcs[index];
 
 		// object pointers
-		const JSONObject* currentObject = OLGetObject(&list, index);
-		const JSONObject* weapons = OMGetObject(&currentObject->objects, "Weapons");
-		const JSONObject* armorObject = OMGetObject(&currentObject->objects, "Armor");
-		const JSONObject* attributes = OMGetObject(&currentObject->objects, "Attributes");
+		const JSONObject* currentObject = JSONListGet(&list, index);
+		const JSONObject* weapons = JSONMapGet(&currentObject->objects, "Weapons");
+		const JSONObject* armorObject = JSONMapGet(&currentObject->objects, "Armor");
+		const JSONObject* attributes = JSONMapGet(&currentObject->objects, "Attributes");
 
 		// array pointers
-		const JSONArray* rHand = AMGetArray(&weapons->arrays, "R-hand Weapons");
-		const JSONArray* lHand = AMGetArray(&weapons->arrays, "L-hand Weapons");
-		const JSONArray* arrows = AMGetArray(&currentObject->arrays, "Arrows");
-		const JSONArray* bolts = AMGetArray(&currentObject->arrays, "Bolts");
-		const JSONArray* spells = AMGetArray(&currentObject->arrays, "Spells");
-		const JSONArray* items = AMGetArray(&currentObject->arrays, "Items");
+		const JSONArray* rHand = JSONMapGet(&weapons->arrays, "R-hand Weapons");
+		const JSONArray* lHand = JSONMapGet(&weapons->arrays, "L-hand Weapons");
+		const JSONArray* arrows = JSONMapGet(&currentObject->arrays, "Arrows");
+		const JSONArray* bolts = JSONMapGet(&currentObject->arrays, "Bolts");
+		const JSONArray* spells = JSONMapGet(&currentObject->arrays, "Spells");
+		const JSONArray* items = JSONMapGet(&currentObject->arrays, "Items");
 
 		// string pointers
 		const char* name = SMGetString(&currentObject->values, "Name");
