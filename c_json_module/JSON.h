@@ -3,48 +3,35 @@
 #include "StringMap.h"
 #include "StringList.h"
 
-typedef struct JSONObjectList
+typedef struct JSONList
 {
-	struct OLNode* first;
+	struct JSONListNode* first;
 	int length;
-} JSONObjectList;
+} JSONList;
 
-typedef struct JSONArrayList
+typedef struct JSONMap
 {
-	struct ALNode* first;
-	int length;
-} JSONArrayList;
-
-typedef struct JSONObjectMap
-{
-	struct OMNode* first;
-} JSONObjectMap;
-
-typedef struct JSONArrayMap
-{
-	struct AMNode* first;
-} JSONArrayMap;
+	struct JSONMapNode* first;
+} JSONMap;
 
 typedef struct JSONObject
 {
-	JSONObjectMap objects;
-	JSONArrayMap arrays;
+	JSONMap objects;
+	JSONMap arrays;
 	StringMap values;
 	void* parent;
 } JSONObject;
 
 typedef struct JSONArray
 {
-	JSONObjectList objects;
-	JSONArrayList arrays;
+	JSONList objects;
+	JSONList arrays;
 	StringList values;
 	void* parent;
 } JSONArray;
 
-JSONObjectList JSONParse(const char* file);
-int JSONFree(JSONObjectList* this);
+JSONList JSONParse(const char* file);
+int JSONFree(JSONList* this);
 
-JSONObject* OLGetObject(JSONObjectList* this, int index);
-JSONArray* ALGetArray(JSONArrayList* this, int index);
-JSONObject* OMGetObject(JSONObjectMap* this, const char* key);
-JSONArray* AMGetArray(JSONArrayMap* this, const char* key);
+union JSON* JSONListGet(JSONList* this, int index);
+union JSON* JSONMapGet(JSONMap* this, const char* key);
